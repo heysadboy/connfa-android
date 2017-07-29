@@ -72,6 +72,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-analytics:9.0.0'
     compile 'com.google.android.gms:play-services-maps:9.0.0'
     compile 'com.google.code.gson:gson:2.2.4'
+    compile 'com.squareup.okhttp:okhttp:2.4.0'
     compile 'org.jetbrains:annotations:13.0'
     compile 'com.jpardogo.materialtabstrip:library:1.0.8'
     compile('com.twitter.sdk.android:twitter:1.13.1@aar') {
