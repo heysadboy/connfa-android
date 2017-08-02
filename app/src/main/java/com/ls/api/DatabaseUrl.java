@@ -13,7 +13,9 @@ public class DatabaseUrl {
 
     public static String url = "https://raw.githubusercontent.com/heysadboy/open-event-apps/master/samples/googleio2017.json";
 
-    private DatabaseUrl() {
+    public static String tracksUrl = "https://raw.githubusercontent.com/fossasia/open-event/master/sample/GoogleIO17/tracks";
+
+    public DatabaseUrl() {
     }
 
     public static DatabaseUrl getInstance() {
@@ -27,9 +29,9 @@ public class DatabaseUrl {
         return uniqueInstance;
     }
 
-    public String getConferenceData(String page) {
+    public String getConferenceData() {
         return url;
     }
 
-
+    public String getTracksUrl() {return tracksUrl;}
 }

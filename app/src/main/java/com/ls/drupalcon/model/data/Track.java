@@ -1,15 +1,11 @@
 package com.ls.drupalcon.model.data;
 
-import com.google.gson.annotations.SerializedName;
-
-import com.ls.drupalcon.model.database.AbstractEntity;
-import com.ls.utils.CursorParser;
-
 import android.content.ContentValues;
 import android.database.Cursor;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.gson.annotations.SerializedName;
+import com.ls.drupalcon.model.database.AbstractEntity;
+import com.ls.utils.CursorParser;
 public class Track extends AbstractEntity<Long> {
 
     @SerializedName("trackId")
@@ -70,13 +66,4 @@ public class Track extends AbstractEntity<Long> {
         return mOrder;
     }
 
-    public static class Holder {
-
-        @SerializedName("tracks")
-        private List<Track> mTracks = new ArrayList<Track>();
-
-        public List<Track> getTracks() {
-            return mTracks;
-        }
-    }
 }

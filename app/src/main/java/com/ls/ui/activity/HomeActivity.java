@@ -10,10 +10,14 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.ls.api.AsyncDownloader;
+import com.ls.api.DatabaseUrl;
+import com.ls.api.Processor;
 import com.ls.drupalcon.R;
 import com.ls.drupalcon.model.Model;
 import com.ls.drupalcon.model.UpdateRequest;
@@ -32,23 +36,27 @@ import com.ls.utils.AnalyticsManager;
 import com.ls.utils.KeyboardUtils;
 import com.ls.utils.ScheduleManager;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class HomeActivity extends StateActivity implements FilterDialog.OnFilterApplied {
+public class HomeActivity extends StateActivity implements FilterDialog.OnFilterApplied, AsyncDownloader.JsonDataSetter {
 
     private DrawerManager mFrManager;
     private DrawerAdapter mAdapter;
     private int mPresentTitle;
     private int mSelectedItem = 0;
     private boolean isIntentHandled = false;
+    private AsyncDownloader downloader;
+    private List<Track> tracks;
 
     private Toolbar mToolbar;
     private DrawerLayout mDrawerLayout;
 
     public FilterDialog mFilterDialog;
     public boolean mIsDrawerItemClicked;
+    private TracksManager tracksManager;
 
     private UpdatesManager.DataUpdatedListener updateReceiver = new UpdatesManager.DataUpdatedListener() {
         @Override
@@ -164,41 +172,9 @@ public class HomeActivity extends StateActivity implements FilterDialog.OnFilter
     }
 
     public void initFilterDialog() {
-        new AsyncTask<Void, Void, List<EventListItem>>() {
-            @Override
-            protected List<EventListItem> doInBackground(Void... params) {
-                TracksManager tracksManager = Model.instance().getTracksManager();
-                List<Track> trackList = tracksManager.getTracks();
-                List<Level> levelList = tracksManager.getLevels();
-
-                Collections.sort(trackList, new Comparator<Track>() {
-                    @Override
-                    public int compare(Track track1, Track track2) {
-                        String name1 = track1.getName();
-                        String name2 = track2.getName();
-                        return name1.compareToIgnoreCase(name2);
-                    }
-                });
-
-                String[] tracks = new String[trackList.size()];
-                String[] levels = new String[levelList.size()];
-
-                for (int i = 0; i < trackList.size(); i++) {
-                    tracks[i] = trackList.get(i).getName();
-                }
-
-                for (int i = 0; i < levelList.size(); i++) {
-                    levels[i] = levelList.get(i).getName();
-                }
-                mFilterDialog = FilterDialog.newInstance(tracks, levels);
-                mFilterDialog.setData(levelList, trackList);
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(List<EventListItem> eventListItems) {
-            }
-        }.execute();
+        DatabaseUrl databaseUrl = new DatabaseUrl();
+        downloader = new AsyncDownloader(this);
+        downloader.execute(databaseUrl.getTracksUrl());
     }
 
     public void closeFilterDialog() {
@@ -268,5 +244,51 @@ public class HomeActivity extends StateActivity implements FilterDialog.OnFilter
             ft.add(new IrrelevantTimezoneDialogFragment(), IrrelevantTimezoneDialogFragment.TAG);
             ft.commitAllowingStateLoss();
         }
+    }
+
+    @Override
+    public void setJsonData(String str) {
+
+        Processor processor = new Processor(str);
+        tracks = processor.trackProcessor();
+        tracksManager = new TracksManager();
+        tracksManager.setTracks(tracks);
+
+        new AsyncTask<Void, Void, List<EventListItem>>() {
+            @Override
+            protected List<EventListItem> doInBackground(Void... params) {
+
+                List<Track> trackList = tracksManager.getTracks();
+                List<Level> levelList = tracksManager.getLevels();
+
+                Collections.sort(trackList, new Comparator<Track>() {
+                    @Override
+                    public int compare(Track track1, Track track2) {
+                        String name1 = track1.getName();
+                        String name2 = track2.getName();
+                        return name1.compareToIgnoreCase(name2);
+                    }
+                });
+
+                String[] tracks = new String[trackList.size()];
+                String[] levels = new String[levelList.size()];
+
+                for (int i = 0; i < trackList.size(); i++) {
+                    tracks[i] = trackList.get(i).getName();
+                }
+
+                for (int i = 0; i < levelList.size(); i++) {
+                    levels[i] = levelList.get(i).getName();
+                }
+                mFilterDialog = FilterDialog.newInstance(tracks, levels);
+                mFilterDialog.setData(levelList, trackList);
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(List<EventListItem> eventListItems) {
+            }
+        }.execute();
+        downloader.cancel(true);
     }
 }

@@ -1,41 +1,27 @@
 package com.ls.drupalcon.model.managers;
 
-import com.ls.drupal.AbstractBaseDrupalEntity;
-import com.ls.drupal.DrupalClient;
 import com.ls.drupalcon.model.Model;
 import com.ls.drupalcon.model.dao.TrackDao;
 import com.ls.drupalcon.model.data.Level;
 import com.ls.drupalcon.model.data.Track;
-import com.ls.drupalcon.model.requests.TracksRequest;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class TracksManager extends SynchronousItemManager<Track.Holder, Object, String> {
+public class TracksManager{
 
     private TrackDao mTrackDao;
 
-    public TracksManager(DrupalClient client) {
-        super(client);
+
+    public TracksManager() {
         mTrackDao = new TrackDao();
     }
 
-    @Override
-    protected AbstractBaseDrupalEntity getEntityToFetch(DrupalClient client, Object requestParams) {
-        return new TracksRequest(client);
-    }
-
-    @Override
-    protected String getEntityRequestTag(Object params) {
-        return "tracks";
-    }
-
-    @Override
-    protected boolean storeResponse(Track.Holder requestResponse, String tag) {
-        List<Track> tracks = requestResponse.getTracks();
-        if (tracks == null) return false;
-
+    public void setTracks(List<Track> tracks)
+    {
+        mTrackDao = new TrackDao();
         mTrackDao.saveOrUpdateDataSafe(tracks);
         for (Track track : tracks) {
             if (track != null) {
@@ -44,7 +30,6 @@ public class TracksManager extends SynchronousItemManager<Track.Holder, Object, 
                 }
             }
         }
-        return true;
     }
 
     public List<Track> getTracks() {
@@ -80,4 +65,5 @@ public class TracksManager extends SynchronousItemManager<Track.Holder, Object, 
     public void clear() {
         mTrackDao.deleteAll();
     }
+
 }

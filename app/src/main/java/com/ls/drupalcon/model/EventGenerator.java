@@ -15,7 +15,6 @@ import com.ls.ui.adapter.item.EventItemCreator;
 import com.ls.ui.adapter.item.EventListItem;
 import com.ls.ui.adapter.item.ProgramItem;
 import com.ls.ui.adapter.item.TimeRangeItem;
-import com.ls.utils.L;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -25,8 +24,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 public class EventGenerator {
 
@@ -226,7 +223,7 @@ public class EventGenerator {
 
     private List<EventListItem> generateEventItems(List<EventListItem> eventListItems,
                                                    EventItemCreator eventItemCreator) {
-        TracksManager tracksManager = Model.instance().getTracksManager();
+        TracksManager tracksManager = new TracksManager();
         List<EventListItem> result = new ArrayList<>();
 
         if (eventListItems.size() > 0) {
