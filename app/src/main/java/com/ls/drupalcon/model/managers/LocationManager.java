@@ -1,38 +1,20 @@
 package com.ls.drupalcon.model.managers;
 
-import com.ls.drupal.AbstractBaseDrupalEntity;
-import com.ls.drupal.DrupalClient;
 import com.ls.drupalcon.model.dao.LocationDao;
 import com.ls.drupalcon.model.data.Location;
-import com.ls.drupalcon.model.requests.LocationRequest;
 
 import java.util.List;
 
-public class LocationManager extends SynchronousItemManager<Location.Holder, Object, String> {
+public class LocationManager {
 
     private LocationDao mLocationDao;
-    public LocationManager(DrupalClient client) {
-        super(client);
+
+    public LocationManager() {
         mLocationDao = new LocationDao();
     }
 
-    @Override
-    protected AbstractBaseDrupalEntity getEntityToFetch(DrupalClient client, Object requestParams) {
-        return new LocationRequest(client);
-    }
-
-    @Override
-    protected String getEntityRequestTag(Object params) {
-        return "location";
-    }
-
-    @Override
-    protected boolean storeResponse(Location.Holder requestResponse, String tag) {
-        List<Location> locations = requestResponse.getLocations();
-        if (locations == null) {
-            return false;
-        }
-
+    public void setLocations(List<Location> locations) {
+        mLocationDao = new LocationDao();
         mLocationDao.saveOrUpdateDataSafe(locations);
         for (Location location : locations) {
             if (location != null) {
@@ -41,7 +23,6 @@ public class LocationManager extends SynchronousItemManager<Location.Holder, Obj
                 }
             }
         }
-        return true;
     }
 
     public List<Location> getLocations() {

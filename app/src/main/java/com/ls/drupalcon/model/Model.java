@@ -201,7 +201,7 @@ public class Model {
         levelsManager = new LevelsManager(client);
         //tracksManager = new TracksManager(client);
         speakerManager = new SpeakerManager(client);
-        locationmanager = new LocationManager(client);
+        //locationmanager = new LocationManager(client);
         socialManager = new SocialManager(client);
         bofsManager = new BofsManager(client);
         poisManager = new PoisManager(client);

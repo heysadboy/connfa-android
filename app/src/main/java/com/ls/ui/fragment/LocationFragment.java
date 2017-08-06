@@ -1,33 +1,32 @@
 package com.ls.ui.fragment;
 
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.ls.api.AsyncDownloader;
+import com.ls.api.DatabaseUrl;
+import com.ls.api.Processor;
 import com.ls.drupalcon.R;
 import com.ls.drupalcon.model.Model;
 import com.ls.drupalcon.model.UpdateRequest;
 import com.ls.drupalcon.model.UpdatesManager;
 import com.ls.drupalcon.model.data.Location;
 import com.ls.drupalcon.model.managers.LocationManager;
-import com.ls.ui.view.RoundedBackgroundSpan;
-
-import android.graphics.Color;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
 import java.util.List;
 
-public class LocationFragment extends Fragment implements CustomMapFragment.OnActivityCreatedListener {
+public class LocationFragment extends Fragment implements CustomMapFragment.OnActivityCreatedListener, AsyncDownloader.JsonDataSetter {
 
     private static final int ZOOM_LEVEL = 15;
     private static final int TILT_LEVEL = 0;
@@ -35,6 +34,11 @@ public class LocationFragment extends Fragment implements CustomMapFragment.OnAc
 
     public static final String TAG = "LocationsFragment";
     private GoogleMap mGoogleMap;
+
+    private AsyncDownloader downloader;
+    private List<Location> locations;
+
+    private LocationManager locationManager;
 
     private UpdatesManager.DataUpdatedListener updateListener = new UpdatesManager.DataUpdatedListener() {
         @Override
@@ -46,6 +50,7 @@ public class LocationFragment extends Fragment implements CustomMapFragment.OnAc
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setHasOptionsMenu(true);
     }
 
@@ -70,25 +75,17 @@ public class LocationFragment extends Fragment implements CustomMapFragment.OnAc
     @Override
     public void onActivityCreated(GoogleMap googleMap) {
         mGoogleMap = googleMap;
-        new LoadLocations().execute();
-    }
 
-    private class LoadLocations extends AsyncTask<Void, Void, List<Location>> {
-        @Override
-        protected List<Location> doInBackground(Void... params) {
-            LocationManager locationManager = Model.instance().getLocationManager();
-            return locationManager.getLocations();
-        }
-
-        @Override
-        protected void onPostExecute(List<Location> locations) {
-            hideProgressBar();
-            fillMapViews(locations);
-        }
+        DatabaseUrl databaseUrl = new DatabaseUrl();
+        downloader = new AsyncDownloader(LocationFragment.this);
+        downloader.execute(databaseUrl.getLocationUrl());
     }
 
     private void fillMapViews(List<Location> locations) {
-        if (mGoogleMap == null) return;
+
+        if (mGoogleMap == null){
+            return;
+        }
 
         if (locations == null || locations.isEmpty()) {
             TextView textViewAddress = (TextView) getView().findViewById(R.id.txtAddress);
@@ -96,6 +93,7 @@ public class LocationFragment extends Fragment implements CustomMapFragment.OnAc
         }
 
         for (int i = 0; i < locations.size(); i++) {
+
             Location location = locations.get(i);
             LatLng position = new LatLng(location.getLat(), location.getLon());
             mGoogleMap.addMarker(new MarkerOptions().position(position));
@@ -144,5 +142,21 @@ public class LocationFragment extends Fragment implements CustomMapFragment.OnAc
         if (getView() != null) {
             getView().findViewById(R.id.progressBar).setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public void setJsonData(String str) {
+
+        Processor processor = new Processor(str);
+        locations = processor.locationProcessor();
+        locationManager  = new LocationManager();
+        locationManager.setLocations(locations);
+
+        locations = locationManager.getLocations();
+
+        hideProgressBar();
+        fillMapViews(locations);
+
+        downloader.cancel(true);
     }
 }

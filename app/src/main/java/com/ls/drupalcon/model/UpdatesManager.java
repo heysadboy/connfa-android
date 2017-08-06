@@ -165,9 +165,9 @@ public class UpdatesManager {
                 manager = Model.instance().getSpeakerManager();
                 break;
 
-            case LOCATIONS:
+            /*case LOCATIONS:
                 manager = Model.instance().getLocationManager();
-                break;
+                break;*/
 
             case PROGRAMS:
                 manager = Model.instance().getProgramManager();

@@ -2,7 +2,7 @@
 <resources>
 
     <string name="api_value_base_url">http://connfa-integration.uat.link/api/v2/euna-mcdermott-dds/</string>
-    <string name="api_value_google_maps_api_key">AIzaSyBssk81wlfgQCQ-QE12wKtDQtiPlV-nwZI</string>
+    <string name="api_value_google_maps_api_key">AIzaSyCAFXwigtURi4rXKI-tcg2MzXip0_SWfMw</string>
     <string name="api_value_twitter_api_key">Mxl1GoGSM98T3jTIWdlUuqXmh</string>
     <string name="api_value_twitter_secret">UM74rykaGhxPhhKED2KxJrd6zGBLNWgVsGdlzjdSwSNqLTiyqY</string>
 
