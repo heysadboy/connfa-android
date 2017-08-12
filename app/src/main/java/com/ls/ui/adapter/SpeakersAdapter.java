@@ -6,6 +6,7 @@ import com.ls.ui.fragment.SpeakersListFragment;
 import com.ls.ui.view.CircleImageView;
 
 import android.content.Context;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;

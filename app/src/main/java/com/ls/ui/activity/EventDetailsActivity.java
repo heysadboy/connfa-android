@@ -355,6 +355,7 @@ public class EventDetailsActivity extends StackKeeperActivity {
         TextView txtJob = (TextView) speakerView.findViewById(R.id.txtOrgAndJobTitle);
         txtJob.setText(organization + space + jobTitle);
 
+
         speakerView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

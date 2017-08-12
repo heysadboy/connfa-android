@@ -9,12 +9,13 @@ public class DatabaseUrl {
 
     private volatile static DatabaseUrl uniqueInstance;
 
-    public static String eventsUrl = "https://raw.githubusercontent.com/fossasia/open-event/master/sample/FOSSASIA16/event";
-    public static String tracksUrl = "https://raw.githubusercontent.com/fossasia/open-event/master/sample/FOSSASIA16/tracks";
-    public static String locationUrl = "https://raw.githubusercontent.com/fossasia/open-event/master/sample/FOSSASIA16/microlocations";
-    public static String sessionUrl = "https://raw.githubusercontent.com/fossasia/open-event/master/sample/FOSSASIA16/sessions";
-    public static String speakerUrl = "https://raw.githubusercontent.com/fossasia/open-event/master/sample/FOSSASIA16/speakers";
-    public static String sessionTypes = "https://raw.githubusercontent.com/fossasia/open-event/master/sample/FOSSASIA16/session_types";
+    public static String baseUrl = "https://raw.githubusercontent.com/fossasia/open-event/master/sample/FOSSASIA16";
+    public static String eventsUrl = baseUrl +  "/event";
+    public static String tracksUrl = baseUrl + "/tracks";
+    public static String locationUrl = baseUrl + "/microlocations";
+    public static String sessionUrl = baseUrl + "/sessions";
+    public static String speakerUrl = baseUrl + "/speakers";
+    public static String sessionTypes = baseUrl + "/session_types";
 
     public DatabaseUrl() {
     }
@@ -29,6 +30,8 @@ public class DatabaseUrl {
         }
         return uniqueInstance;
     }
+
+    public String getBaseUrl() {return baseUrl; }
 
     public String getEventsUrl() {
         return eventsUrl;

@@ -65,6 +65,21 @@ public class SpeakerDetailsActivity extends StackKeeperActivity implements View.
             loadSpeakerFromDb();
         }
     };
+    private NotifyingScrollView.OnScrollChangedListener onScrollChangedListener = new NotifyingScrollView.OnScrollChangedListener() {
+
+        @Override
+        public void onScrollChanged(ScrollView who, int l, int t, int oldl, int oldt) {
+            int headerHeight = findViewById(R.id.imgHeader).getHeight();
+            float headerRatio = (float) Math.min(Math.max(t, 0), headerHeight) / headerHeight;
+
+            fadeActionBar(headerRatio);
+        }
+
+        private void fadeActionBar(float headerRatio) {
+            mTitle.setAlpha(headerRatio);
+            mViewToolbar.setAlpha(headerRatio);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,6 +152,7 @@ public class SpeakerDetailsActivity extends StackKeeperActivity implements View.
         new AsyncTask<Void, Void, Speaker>() {
             @Override
             protected Speaker doInBackground(Void... params) {
+                mSpeakerManager = new SpeakerManager();
                 return mSpeakerManager.getSpeakerById(mSpeakerId);
             }
 
@@ -327,22 +343,6 @@ public class SpeakerDetailsActivity extends StackKeeperActivity implements View.
                 break;
         }
     }
-
-    private NotifyingScrollView.OnScrollChangedListener onScrollChangedListener = new NotifyingScrollView.OnScrollChangedListener() {
-
-        @Override
-        public void onScrollChanged(ScrollView who, int l, int t, int oldl, int oldt) {
-            int headerHeight = findViewById(R.id.imgHeader).getHeight();
-            float headerRatio = (float) Math.min(Math.max(t, 0), headerHeight) / headerHeight;
-
-            fadeActionBar(headerRatio);
-        }
-
-        private void fadeActionBar(float headerRatio) {
-            mTitle.setAlpha(headerRatio);
-            mViewToolbar.setAlpha(headerRatio);
-        }
-    };
 
     private void openBrowser(String url) {
         try {

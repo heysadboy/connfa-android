@@ -3,6 +3,7 @@ package com.ls.api;
 import android.util.Log;
 
 import com.ls.drupalcon.model.data.Location;
+import com.ls.drupalcon.model.data.Speaker;
 import com.ls.drupalcon.model.data.Track;
 
 import org.json.JSONArray;
@@ -17,14 +18,71 @@ import java.util.List;
  */
 
 public class Processor {
+    public List<Track> trackList = new ArrayList<>();
+    public List<Location> locationList = new ArrayList<>();
+    public List<Speaker> speakerList = new ArrayList<>();
     private String output;
-
-    public List<Track> listTrack = new ArrayList<>();
-    public List<Location> listLocation = new ArrayList<>();
 
 
     public Processor(String output) {
         this.output = output;
+    }
+
+    public List<Speaker> speakerProcessor() {
+        try {
+            JSONArray speakers = new JSONArray(output);
+            int i;
+
+            Speaker speaker;
+            DatabaseUrl databaseUrl = new DatabaseUrl();
+
+            for (i = 0; i < speakers.length(); i++) {
+                JSONObject speakerJSONObject = speakers.getJSONObject(i);
+                speaker = new Speaker();
+
+                speaker.setId(speakerJSONObject.getLong("id"));
+                String name = speakerJSONObject.getString("name");
+
+                String firstName;
+                String lastName;
+
+                if (name.contains(" ")) {
+                    firstName = name.substring(0, name.indexOf(' '));
+                    lastName = name.substring(name.indexOf(' '));
+                    speaker.setFirstName(firstName);
+                    speaker.setLastName(lastName);
+                } else {
+                    firstName = name;
+                    lastName = "";
+                    speaker.setFirstName(firstName);
+                    speaker.setLastName(lastName);
+                }
+
+                speaker.setAvatarImageUrl(databaseUrl.getBaseUrl() + speakerJSONObject.getString("photo"));
+                speaker.setOrganization(speakerJSONObject.getString("organisation"));
+                speaker.setJobTitle(speakerJSONObject.getString("position"));
+                if (speaker.getJobTitle().equals("null")) {
+                    speaker.setJobTitle("");
+                }
+                speaker.setCharact(speakerJSONObject.getString("long_biography"));
+                String twitter = speakerJSONObject.getString("twitter");
+                if (twitter.length() > 0) {
+                    twitter = twitter.substring(19);
+                    if (twitter.contains("/"))
+                        twitter = twitter.substring(1);
+                    speaker.setTwitterName(twitter);
+                } else {
+                    speaker.setTwitterName(null);
+                }
+                speaker.setWebSite(speakerJSONObject.getString("website"));
+
+                speakerList.add(speaker);
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return speakerList;
     }
 
     public List<Location> locationProcessor() {
@@ -45,14 +103,14 @@ public class Processor {
                 location.setLat(locationJSONObject.getDouble("latitude"));
                 location.setLon(locationJSONObject.getDouble("longitude"));
 
-                listLocation.add(location);
+                locationList.add(location);
             }
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        return listLocation;
+        return locationList;
     }
 
     public List<Track> trackProcessor() {
@@ -69,13 +127,13 @@ public class Processor {
                 track.setId(tracksJSONObject.getLong("id"));
                 track.setName(tracksJSONObject.getString("name"));
 
-                listTrack.add(track);
+                trackList.add(track);
             }
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return listTrack;
+        return trackList;
     }
 
 }
