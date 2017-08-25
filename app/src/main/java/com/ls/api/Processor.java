@@ -99,7 +99,7 @@ public class Processor {
 
                 location.setId(locationJSONObject.getLong("id"));
                 location.setName(locationJSONObject.getString("name"));
-                location.setAddress("Floor " + locationJSONObject.getLong("floor") + ", " + locationJSONObject.getString("name"));
+                location.setAddress("Floor " + locationJSONObject.getLong("floor"));
                 location.setLat(locationJSONObject.getDouble("latitude"));
                 location.setLon(locationJSONObject.getDouble("longitude"));
 

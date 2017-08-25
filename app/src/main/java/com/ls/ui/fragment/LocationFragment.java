@@ -11,8 +11,10 @@ import android.widget.TextView;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.ls.api.AsyncDownloader;
 import com.ls.api.DatabaseUrl;
@@ -25,12 +27,15 @@ import com.ls.drupalcon.model.data.Location;
 import com.ls.drupalcon.model.managers.LocationManager;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LocationFragment extends Fragment implements CustomMapFragment.OnActivityCreatedListener, AsyncDownloader.JsonDataSetter {
 
     private static final int ZOOM_LEVEL = 15;
     private static final int TILT_LEVEL = 0;
     private static final int BEARING_LEVEL = 0;
+    private Marker previousMarker = null;
 
     public static final String TAG = "LocationsFragment";
     private GoogleMap mGoogleMap;
@@ -81,9 +86,9 @@ public class LocationFragment extends Fragment implements CustomMapFragment.OnAc
         downloader.execute(databaseUrl.getLocationUrl());
     }
 
-    private void fillMapViews(List<Location> locations) {
+    private void fillMapViews(final List<Location> locations) {
 
-        if (mGoogleMap == null){
+        if (mGoogleMap == null) {
             return;
         }
 
@@ -96,12 +101,17 @@ public class LocationFragment extends Fragment implements CustomMapFragment.OnAc
 
             Location location = locations.get(i);
             LatLng position = new LatLng(location.getLat(), location.getLon());
-            mGoogleMap.addMarker(new MarkerOptions().position(position));
+
+            String locationName = location.getName();
+            String address = location.getAddress();
+            address = address.replace(",", "\n");
+
+            mGoogleMap.addMarker(new MarkerOptions().position(position)).setTitle(locationName + "#" + address);
 
             if (i == 0) {
                 CameraPosition camPos = new CameraPosition(position, ZOOM_LEVEL, TILT_LEVEL, BEARING_LEVEL);
                 mGoogleMap.moveCamera(CameraUpdateFactory.newCameraPosition(camPos));
-                fillTextViews(location);
+                fillTextViews(locationName + "#" + address);
             }
         }
 
@@ -110,9 +120,25 @@ public class LocationFragment extends Fragment implements CustomMapFragment.OnAc
         uiSettings.setMyLocationButtonEnabled(false);
         uiSettings.setCompassEnabled(false);
         uiSettings.setRotateGesturesEnabled(false);
+
+        mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                String locAddress = marker.getTitle();
+                fillTextViews(locAddress);
+                if (previousMarker != null) {
+                    previousMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                }
+                marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                previousMarker = marker;
+
+                return true;
+            }
+        });
     }
 
-    private void fillTextViews(Location location) {
+    private void fillTextViews(String locAddress) {
         if (getView() == null) {
             return;
         }
@@ -120,13 +146,16 @@ public class LocationFragment extends Fragment implements CustomMapFragment.OnAc
         TextView txtAmsterdam = (TextView) getView().findViewById(R.id.txtPlace);
         TextView txtAddress = (TextView) getView().findViewById(R.id.txtAddress);
 
-        String locationName = location.getName();
-        txtAmsterdam.setText(locationName);
+        String locationName;
+        String address;
 
-        String address = location.getAddress();
-//        address = address.replace(", ", "\n");
-        address = address.replace(",", "\n");
-        txtAddress.setText(address.trim());
+        int i = locAddress.indexOf("#");
+
+        locationName = locAddress.substring(0, i);
+        address = locAddress.substring(i + 1);
+        txtAmsterdam.setText(locationName);
+        txtAddress.setText(address);
+
     }
 
     private void replaceMapFragment() {
@@ -149,7 +178,7 @@ public class LocationFragment extends Fragment implements CustomMapFragment.OnAc
 
         Processor processor = new Processor(str);
         locations = processor.locationProcessor();
-        locationManager  = new LocationManager();
+        locationManager = new LocationManager();
         locationManager.setLocations(locations);
 
         locations = locationManager.getLocations();
