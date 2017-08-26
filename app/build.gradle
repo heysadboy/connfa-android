@@ -36,25 +36,21 @@ android {
         }
 
     }
-    signingConfigs {
-        config {
-            keyAlias 'drupalcon'
-            keyPassword 'lembergsolutions'
-            storeFile file('keystore/keystore.keystore')
-            storePassword 'lembergsolutions'
-        }
-    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.config
         }
     }
 
     dexOptions {
         preDexLibraries = false
         javaMaxHeapSize "4g"
+    }
+
+    lintOptions {
+        abortOnError false
     }
 }
 
