@@ -150,10 +150,6 @@ public class Model {
         return programManager;
     }
 
-    public ProgramManager createProgramManager() {
-        return new ProgramManager(client);
-    }
-
     public UpdatesManager getUpdatesManager() {
         return updatesManager;
     }
@@ -206,7 +202,7 @@ public class Model {
         bofsManager = new BofsManager(client);
         poisManager = new PoisManager(client);
         infoManager = new InfoManager(client);
-        programManager = new ProgramManager(client);
+        //programManager = new ProgramManager(client);
         eventManager = new EventManager(client);
         favoriteManager = new FavoriteManager();
 

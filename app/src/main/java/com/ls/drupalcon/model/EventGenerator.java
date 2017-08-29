@@ -38,7 +38,7 @@ public class EventGenerator {
         mEventManager = Model.instance().getEventManager();
         mBofsManager = Model.instance().getBofsManager();
         mSocialManager = Model.instance().getSocialManager();
-        mProgramManager = Model.instance().createProgramManager();
+        mProgramManager = new ProgramManager();
     }
 
     public List<EventListItem> generate(long day, int eventClass, @NotNull EventItemCreator eventItemCreator) {

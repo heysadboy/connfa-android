@@ -30,6 +30,7 @@ public class Processor {
     private List<Speaker> speakerList = new ArrayList<>();
     private List<Event> eventList = new ArrayList<>();
     private List<Long> dayList = new ArrayList<>();
+    private List<String> days = new ArrayList<>();
     private String output;
 
 
@@ -37,13 +38,15 @@ public class Processor {
         this.output = output;
     }
 
-    public List<Long> getDayList()
-    {
+    public List<String> getDays() {
+        return days;
+    }
+
+    public List<Long> getDayList() {
         return dayList;
     }
 
-    public List<Event> eventProcessor()
-    {
+    public List<Event> eventProcessor() {
 
         try {
             JSONArray events = new JSONArray(output);
@@ -59,9 +62,11 @@ public class Processor {
                 event.setFromTime(eventJSONObject.getString("starts-at"));
                 event.setToTime(eventJSONObject.getString("ends-at"));
 
-                String startT = event.getFromTime().substring(0,event.getFromTime().indexOf("T"));
-                String endT = event.getToTime().substring(0,event.getToTime().indexOf("T"));
+                String startT = event.getFromTime().substring(0, event.getFromTime().indexOf("T"));
+                String endT = event.getToTime().substring(0, event.getToTime().indexOf("T"));
 
+                days.add(startT);
+                days.add(endT);
                 dayList.add(convertTime(startT));
                 dayList.add(convertTime(endT));
 
@@ -75,8 +80,7 @@ public class Processor {
 
                 JSONArray speakersArray = eventJSONObject.getJSONArray("speakers");
 
-                for(j=0;j<speakersArray.length();j++)
-                {
+                for (j = 0; j < speakersArray.length(); j++) {
                     JSONObject speaker = speakersArray.getJSONObject(j);
                     speakers.add(speaker.getLong("id"));
                 }
@@ -100,8 +104,14 @@ public class Processor {
         Set uniqueValues = new HashSet(dayList);
         dayList.clear();
         dayList.addAll(uniqueValues);
+
+        Set uniqueValues2 = new HashSet(days);
+        days.clear();
+        days.addAll(uniqueValues2);
+
         return eventList;
     }
+
     public List<Speaker> speakerProcessor() {
         try {
             JSONArray speakers = new JSONArray(output);

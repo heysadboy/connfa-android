@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class Event extends AbstractEntity<Long> implements Comparable<Event>{
+public class Event extends AbstractEntity<Long> implements Comparable<Event> {
 
     //TODO think about better event classes separation
     public static final int PROGRAM_CLASS = 1;
@@ -133,7 +133,7 @@ public class Event extends AbstractEntity<Long> implements Comparable<Event>{
         mName = parser.readString("_name");
         mTrack = parser.readLong("_track");
         mPlace = parser.readString("_place");
-        mExperienceLevel =  parser.readLong("_experience_level");
+        mExperienceLevel = parser.readLong("_experience_level");
 
         mEventClass = parser.readInt("_event_class");
         mIsFavorite = parser.readBoolean("_favorite");
@@ -189,7 +189,7 @@ public class Event extends AbstractEntity<Long> implements Comparable<Event>{
         }
     }
 
-   public void  getHashtagTagText(){
+    public void getHashtagTagText() {
 //       if(mType)
 
     }
@@ -333,15 +333,13 @@ public class Event extends AbstractEntity<Long> implements Comparable<Event>{
 
     @Override
     public int compareTo(@NotNull Event event) {
-        int result =  mFromTime.compareTo(event.getFromTime());
-        if(result == 0)
-        {
-            if(mOrder == event.mOrder)
-            {
+        int result = mFromTime.compareTo(event.getFromTime());
+        if (result == 0) {
+            if (mOrder == event.mOrder) {
                 result = 0;
-            }else if(mOrder > event.mOrder){
+            } else if (mOrder > event.mOrder) {
                 result = 1;
-            }else{
+            } else {
                 result = -1;
             }
         }
@@ -353,6 +351,10 @@ public class Event extends AbstractEntity<Long> implements Comparable<Event>{
 
         @SerializedName("days")
         private List<Day> mDays = new ArrayList<Day>();
+
+        public void setDays(List<Day> mDays) {
+            this.mDays = mDays;
+        }
 
         public List<Day> getDays() {
             return mDays;
@@ -373,8 +375,16 @@ public class Event extends AbstractEntity<Long> implements Comparable<Event>{
         @SerializedName("events") // perhaps this field will be renamed to "socialEvents" in future
         private List<Event> mSocialsEvents = new ArrayList<Event>();
 
+        public void setDate(String date) {
+            this.date = date;
+        }
+
         public String getDate() {
             return date;
+        }
+
+        public void setEvents(List<Event> mProgramEvents) {
+            this.mProgramEvents = mProgramEvents;
         }
 
         public List<Event> getEvents() {

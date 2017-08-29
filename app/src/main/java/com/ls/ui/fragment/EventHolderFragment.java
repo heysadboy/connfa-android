@@ -1,6 +1,23 @@
 package com.ls.ui.fragment;
 
+import android.app.Activity;
+import android.graphics.Typeface;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
 import com.astuetz.PagerSlidingTabStrip;
+import com.ls.api.AsyncDownloader;
+import com.ls.api.DatabaseUrl;
 import com.ls.drupalcon.R;
 import com.ls.drupalcon.app.App;
 import com.ls.drupalcon.model.Model;
@@ -21,26 +38,11 @@ import com.ls.utils.L;
 
 import org.jetbrains.annotations.NotNull;
 
-import android.app.Activity;
-import android.graphics.Typeface;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
-
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class EventHolderFragment extends Fragment {
+public class EventHolderFragment extends Fragment implements AsyncDownloader.JsonDataSetter {
 
     public static final String TAG = "ProjectsFragment";
     private static final String EXTRAS_ARG_MODE = "EXTRAS_ARG_MODE";
@@ -57,10 +59,12 @@ public class EventHolderFragment extends Fragment {
     private EventHolderFragmentStrategy strategy;
     private List<UpdateRequest> requests = new ArrayList<>();
 
+    private AsyncDownloader downloader;
+
 
     private UpdatesManager.DataUpdatedListener updateReceiver = new UpdatesManager.DataUpdatedListener() {
         @Override
-        public void onDataUpdated( List<UpdateRequest> requests) {
+        public void onDataUpdated(List<UpdateRequest> requests) {
             L.e("requests = " + EventHolderFragment.this.requests.size());
             updateData(requests);
         }
@@ -119,9 +123,9 @@ public class EventHolderFragment extends Fragment {
         Model.instance().getUpdatesManager().registerUpdateListener(updateReceiver);
         favoriteReceiver.register(getActivity());
 
-        initData();
-        initView();
-        new LoadData().execute();
+        DatabaseUrl databaseUrl = new DatabaseUrl();
+        downloader = new AsyncDownloader(EventHolderFragment.this);
+        downloader.execute(databaseUrl.getSessionurl());
     }
 
     @Override
@@ -131,14 +135,14 @@ public class EventHolderFragment extends Fragment {
         super.onDestroyView();
     }
 
-    private void initData() {
+    private void initData(String str) {
         Bundle bundle = getArguments();
         if (bundle != null) {
             EventMode eventMode = (EventMode) bundle.getSerializable(EXTRAS_ARG_MODE);
             if (eventMode != null) {
                 switch (eventMode) {
                     case Program:
-                        strategy = new ProgramStrategy();
+                        strategy = new ProgramStrategy(str);
                         break;
                     case Bofs:
                         strategy = new BofsStrategy();
@@ -175,6 +179,13 @@ public class EventHolderFragment extends Fragment {
 
         setHasOptionsMenu(strategy.enableOptionMenu());
 
+    }
+
+    @Override
+    public void setJsonData(String str) {
+        initData(str);
+        initView();
+        new LoadData().execute();
     }
 
     class LoadData extends AsyncTask<Void, Void, List<Long>> {

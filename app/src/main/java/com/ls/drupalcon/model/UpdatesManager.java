@@ -169,9 +169,9 @@ public class UpdatesManager {
                 manager = Model.instance().getLocationManager();
                 break;*/
 
-            case PROGRAMS:
+           /* case PROGRAMS:
                 manager = Model.instance().getProgramManager();
-                break;
+                break;*/
 
             case BOFS:
                 manager = Model.instance().getBofsManager();

@@ -42,7 +42,7 @@ public class DateUtils {
 
     @Nullable
     public synchronized  Date convertEventDayDate(String day) {
-        mDateFormat.applyPattern("d-MM-yyyy");
+        mDateFormat.applyPattern("yyyy-MM-dd");
 
         try {
             return mDateFormat.parse(day);
